@@ -13,8 +13,11 @@ Használjátok ezt a dumpot, még akkor is, ha megjelenik újabb, különben nem
 A Mediawiki markup eltávolítható az Autocorpus nevű eszközzel: http://mpacula.com/autocorpus/
 A wiki-textify modul kell nektek.
 - A kimenetet írjátok fájlba csökkenő gyakorisági sorrendben. Soronként egy szó és annak gyakorisága szerepeljen tabbal elválasztva, pl:
-a <TAB> 123
-az <TAB> 34
+
+    a\<TAB>123
+      
+    az\<TAB>34
+
 - Kétféle megoldást várok:
 
   1. Csak beépített típusokat használsz, 
@@ -43,3 +46,16 @@ Készíts függvényt, amely a bemeneti szövegben lecseréli a paraméterként 
 A paramétereknek legyen alapértelmezett értékük (rare_threshold legyen 5, rare_token legyen _RARE_), amit a hívó felüldefiniálhat.
 
 Gondolkodtató kérdés: hogyan lehetne a rare_thresholdot "okosabban" meghatározni?
+
+###4. feladat: Szótárfedés
+
+Szótárfedés vizsgálata a magyar, és az angol korpuszon
+
+### Végső feladat
+Készíts szótárfedést vizsgáló függvényt vagy osztályt. 
+
+A bemenet két korpusz, az egyikből szótár készül, a másikon vizsgáljuk a szótár fedését. A kimenet a lefedett szavak aránya.Végezz kíséleteket tisztított és tisztítatlan korpuszokkal is felhasználva a korábban készített egyszerű szövegtisztítót.Futtasd le a kíséleteket többféle szótármérettel és ábrázold az eredményeket oszlopdiagramon. A szótárméret 100...1000000 között logaritmikus skálán mozogjon.
+
+A korpuszok: Webcorpus többféle nyelvre, Europarl, ItWAC.
+
+Nyelvek: finn, olasz, francia és dán
