@@ -1,0 +1,108 @@
+\documentclass[a4paper, magyar]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[magyar, english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{testhyphens}
+
+%opening
+\title{Deep learning alapú szótagolás}
+\author{N{\'e}meth Gergely D{\'a}niel}
+\date{}
+
+\begin{document}
+\fontfamily{ptm}\selectfont
+\maketitle
+
+
+
+\selectlanguage{english}
+\begin{abstract}
+
+\end{abstract}
+\selectlanguage{magyar}
+\begin{abstract}
+	
+\end{abstract}
+
+\section{Bevezetés}
+\section{Szótagoló programok}
+Az elterjedt szótagoló algoritmusok kétféle csoportba bonthatóak: szabály- vagy szótáralapúak. A szabad szoftverek világában \textit{de facto} a \TeX szótagolási algoritmusát használják.
+
+A \TeX\,eredeti szótagoló algoritmusát Prof. Knuth tervezte 1977 nyarán\cite{knuth1979tex}. Ez három fő szótagolási szabályt alkalmazott: $1)$ utótag leválasztás, $2)$ előtag leválasztás és $3)$ magánhangzó - mássalhangzó - mássalhangzó - magánhangzó (vccv) elválasztás, azaz ha ilyen betűnégyes található a szóban, legtöbb esetben a mássalhangzók mentén elválasztható. Ez a három szabály gyakran alkalmazható, azonban már az első algoritmusban kiegészült kisebb szabályokkal (,,break vowel-q" vagy ,,break after ck") és kivételek listájával(300 szó).
+
+A \TeX82 verzióhoz megjelent Liang szótagoló algoritmusa\cite{liang1983word}, aminek legfontosabb újítása a minta(\textit{patterns}) alapú szótagolás bevezetése volt. Ennek lényege, hogy a szótagolási szabályok mintákra definiálódtak és az algoritmus a szótagolás során ezeket a mintákat keresi a szóban.
+
+A \TeX jelenlegi verziójában a Hunspell szótagoló algoritmust alkalmazzák\cite{nemeth2006automatic}. Ez az eljárás Liang algoritmusán alapszik, amit nyelvfüggő speciális szótagolási kiterjesztésekkel (\textit{non-standard hyphenation extension}) egészít ki.
+\subsection{Liang algoritmusa}
+Liang szótagoló algoritmusának alapját a szótagolási minták alkotják\cite{liang1983word}. Az algoritmust az angol 
+{\fontfamily{pcr}\selectfont
+	hyphenation%
+} elválasztását az alábbi módon végzi:
+
+Az algoritmus először megnézi, hogy a szó benne van-e a kivételek listájában (ez lényegében teljes szavakat tartalmaz mintaként). A \textit{hyphenation} szó nincs a kivételek listájában.
+
+Ezután a szó elejére és végére illeszt egy pont  jelző karaktert. Ennek jelentősége azoknál a mintáknál lesz, amelyek akkor érvényesülnek, ha a szó elején, vagy a végén szerepelnek.
+{\fontfamily{pcr}\selectfont
+	\begin{center}
+	.hyphenation.
+	\end{center}
+}
+Ezt követően a minták között keres illeszkedést. A \textit{hyphenation} szóra ezek az alábbiak: 
+{\fontfamily{pcr}\selectfont hy3ph, he2n, hena4, hen5at, 1na, n2at, 1tio,  2io} \cite[37.\ oldal]{liang1983word}
+A megfelelő mintákat ráillesztve a szóra, a bennük szereplő számokat a szó karakterei közé szúrva az \ref{liang-hyp}. ábrán szereplőket kapjuk.%
+\footnote{Az ábrázolásmód N{\'e}meth cikkéből származik\cite{nemeth2006automatic}.}
+\begin{figure}[h]\centering
+	{\fontfamily{pcr}\selectfont
+		\setlength{\tabcolsep}{0pt}
+		\begin{tabular}{rrrrrrrrrrrrr}
+			.& h& y& p& h& e& n& a & t& i& o& n& .\\
+			 & h& y&3p& h\\
+			 &  &  &  & h& e&2n\\
+			 &  &  &  & h& e& n& a&4\phantom{t}\\
+			 &  &  &  & h& e& n&5a&t\\
+			 &  &  &  &  &  &1n& a\\
+			 &  &  &  &  &  & n&2a& t\\
+			 &  &  &  &  &  &  &  &1t& i& o\\
+			 &  &  &  &  &  &  &  &  &2i& o\\
+			 \hline
+			 .&0h&0y&3p&0h&0e&2n&5a&4t&2i&0o&0n&0.\\
+			  & h& y&-p& h& e& n&-a& t& i& o& n
+		\end{tabular}
+	}
+\caption{A \textit{hyphenation} szótagolása}\par\medskip\centering
+\label{liang-hyp}
+\end{figure}
+
+
+Az algoritmus következő lépésében minden két szomszédos karakter közé illesztünk egy számot. Alapértelmezetten $0$-t és ha ennél nagyobb számot találtunk a mintaillesztésnél, a legnagyobb kapott értéket adjuk meg.
+
+A szótagolás szabálya innen már csak egy lépés: a páratlan számok mentén elválasztunk, a párosoknál nem. Ezzel megkaptuk a
+{\fontfamily{pcr}\selectfont
+	hy-phen-ation%
+}
+elválasztást.
+\subsubsection{Minták választása}
+A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és hatékonysága határozza meg. Csak azok a szavak választódnak el, amelyekre illeszkedik minta és csak azok lesznek jó elválasztások, melyekre jó minta illeszkedik.
+
+\subsection{Hunspell}
+\subsubsection{Szótagolási hibák a magyar Hunspellben}
+\begin{minipage}{0.5\textwidth}
+	Hunspell szótagolása:
+\begin{checkhyphens}
+	autóval
+\end{checkhyphens} 		
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+	Helyesen:
+	
+	a-u-tó-val
+\end{minipage}
+
+
+\section{Deep learning ismertető}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
