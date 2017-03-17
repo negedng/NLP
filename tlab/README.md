@@ -3,7 +3,7 @@
 For more details: 
 * Course at AUT: https://www.aut.bme.hu/Course/Temalabor
 * Course at VIK: https://portal.vik.bme.hu/kepzes/targyak/VIAUAL00
-* NPL: https://www.aut.bme.hu/Task/16-17-osz/Termeszetes-nyelvfeldolgozas
+* NLP: https://www.aut.bme.hu/Task/16-17-osz/Termeszetes-nyelvfeldolgozas
 
 ## Exercises
 ###1. feladat: Karakter és szószámlálás
