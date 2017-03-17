@@ -87,12 +87,14 @@ A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és ha
 
 \subsection{Hunspell}
 \subsubsection{Szótagolási hibák a magyar Hunspellben}
+
+
 \begin{minipage}{0.5\textwidth}
 	Hunspell szótagolása:
 \begin{checkhyphens}
 	autóval
 \end{checkhyphens} 		
-\end{minipage}
+\end{minipage}\noindent
 \begin{minipage}{0.5\textwidth}
 	Helyesen:
 	
@@ -100,8 +102,33 @@ A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és ha
 \end{minipage}
 
 
-\section{Deep learning ismertető}
+\section{Deep learning alapú módszerek}
+\subsection{Deep learning bevezetés}
+A gépi tanulás területén egyre nagyobb teret nyernek a deep learning alapú módszerek. A hagyományos osztályozási feladatokon túl, szekvenciális, ún. taggelési problémák megoldására is alkalmasak a neurális hálók, különös tekintettel a rekurrens neurális hálókra.
 
+A mély tanulás bevetését a nyelvtechnológia területén az a tény élteti, hogy az elektronikus kommunikáció korában jelentős mennyiségű nyelvi adatbázisok állnak rendelkezésünkre, így a deep learning legfontosabb eleme, a megfelelő méretű tanulóadat elérhető. Az ismertetett elválasztási algoritmusok kulcseleme, hogy megfelelő elválasztási mintákat ismerjünk fel az adathalmazon (\textit{korpusz}). A képfelismerés terén sokkal komplexebb minták megtalálásában is jelentős eredményeket értek el a deep learning segítségével, így e módszer bevetése a szótagolás problémakörében megalapozott.
+
+\subsubsection{Keretrendszerek}
+Deep learning rendszerek tervezésénél az utóbbi időben ipari és kutatói területen egyaránt elterjedőben vannak a magas szintű keretrendszerek. Ezek legnagyobb előnye, hogy az aktív fejlesztői közösség a gyorsan fejlődő tudományág eredményeit alkalmazható technológiákként tárja a felhasználók elé. A jelentősebb keretrendszerek: TensorFlow\footnote{TensorFlow: https://www.tensorflow.org/}, Torch7\footnote{Torch7: http://torch.ch/}, Keras\footnote{Keras: https://keras.io/}. Az itt ismertetett eljárások megvalósításához a Keras nyújtotta lehetőségekkel valósultak meg\cite{chollet2015keras}. 
+\subsection{Előrecsatolt neurális hálók}
+\subsubsection{Karakter cimkézés}
+BMES és BM
+\subsubsection{Adatelőkészítés}
+One-hot, flatten, webcorpus
+\subsubsection{Előrecsatolt háló tanítása}
+\subsection{Rekurrens neurális hálók}
+\section{Eredmények}
+\subsection{Előrecsatolt háló}
+\begin{table}[h]\centering
+	\begin{tabular}{|c|r|c|c|r|r|r|}
+		\hline
+		Tag&Length&Loss&Optim&Batch size&Error valid&Epochs\\
+		\hline
+		BMES&1&cat\_cross&adam&1& & \\ 
+		\hline
+	\end{tabular}
+	\caption{Előrecsatolt háló tanítása különböző paraméterekkel}
+\end{table}
 \bibliographystyle{plain}
 \bibliography{references}
 
