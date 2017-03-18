@@ -124,13 +124,15 @@ One-hot, flatten, webcorpus
 		\hline
 		Tag&Length&Loss&Optim&Batch size&Error valid&Epochs\\
 		\hline
-		BMES&3&cat\_cross&adam&512&0.616&483\\ 
+		BMES&2-1-0&cat\_cross&adam&512&0.616&483\\ 
 		\hline
-		BM&3&bin\_cross&adam&1024&0.262&475\\
+		BM&2-1-0&bin\_cross&adam&1024&0.262&475\\
 		\hline
-		BM&3&cat\_cross&adam&1024&0.261&543\\
+		BM&2-1-0&cat\_cross&adam&1024&0.261&543\\
 		\hline
-		BM&3+1&bin\_cross&adam&1024&0.066&331\\
+		BM&2-1-1&bin\_cross&adam&1024&0.066&331\\
+		\hline
+		BM&2-1-2&bin\_cross&adam&1024&0.050&292\\
 		\hline
 	\end{tabular}
 	\caption{Előrecsatolt háló tanítása különböző paraméterekkel}
