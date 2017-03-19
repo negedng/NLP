@@ -4,6 +4,7 @@
 \usepackage[magyar, english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{testhyphens}
+\usepackage{multirow}
 
 %opening
 \title{Deep learning alapú szótagolás}
@@ -111,32 +112,68 @@ A mély tanulás bevetését a nyelvtechnológia területén az a tény élteti,
 \subsubsection{Keretrendszerek}
 Deep learning rendszerek tervezésénél az utóbbi időben ipari és kutatói területen egyaránt elterjedőben vannak a magas szintű keretrendszerek. Ezek legnagyobb előnye, hogy az aktív fejlesztői közösség a gyorsan fejlődő tudományág eredményeit alkalmazható technológiákként tárja a felhasználók elé. A jelentősebb keretrendszerek: TensorFlow\footnote{TensorFlow: https://www.tensorflow.org/}, Torch7\footnote{Torch7: http://torch.ch/}, Keras\footnote{Keras: https://keras.io/}. Az itt ismertetett eljárások megvalósításához a Keras nyújtotta lehetőségekkel valósultak meg\cite{chollet2015keras}. 
 \subsection{Előrecsatolt neurális hálók}
-\subsubsection{Karakter cimkézés}
-BMES és BM
-\subsubsection{Adatelőkészítés}
+A neurális háló lényege ebben ez esetben az, hogy a szó minden karakterére eldöntsük a környezetében lévő karakterek segítségével, hogy a karakternél van-e elválasztás.
+
+A szavakat minden karakter mentén felbontjuk az adott ablakméretre, majd ezekre az ablakokra tanítva oldunk meg egy osztályozó problémát, ami ad egy címkét a karakternek és a címke alapján végezzük az elválasztást.
+\subsubsection{Karakter címkézés}
+Kétféle címkézést használunk. Az első eset előnye, hogy több címke van így több információt adunk át a modellnek, a másodiké pedig, hogy a jósolt címkézés minden esetben elválasztássá alakítható. Ez a BMES esetében nem teljesül: ha két karakterre egymás után E-t jósol, az nem alakítható rögtön valós elválasztássá. 
+\paragraph{BMES}
+\begin{itemize}
+	\item B - Begin, szótag elején álló karakter
+	\item M - Middle, közepén lévő karakter, se előtte, se utána nincs elválasztás
+	\item E - End, a karakter után elválasztás van
+	\item S - Single, egy karakterből álló szótag
+\end{itemize}
+A
+{\fontfamily{pcr}\selectfont
+	le-o-párd%
+}
+szó címkézése:
+{\fontfamily{pcr}\selectfont
+	BESBMME%
+}
+\paragraph{BM}
+\begin{itemize}
+	\item B - Begin, szótag elején álló karakter
+	\item M - Minden egyéb eset
+\end{itemize}
+A
+{\fontfamily{pcr}\selectfont
+	le-o-párd%
+}
+szó címkézése:
+{\fontfamily{pcr}\selectfont
+	BMBBMMM%
+}
+\subsubsection{Adat-előkészítés}
 One-hot, flatten, webcorpus
 \subsubsection{Előrecsatolt háló tanítása}
-\subsection{Rekurrens neurális hálók}
-\section{Eredmények}
-\subsection{Előrecsatolt háló}
 \begin{table}[h]\centering
-	\begin{tabular}{|c|r|c|c|r|r|r|}
+	\begin{tabular}{|r|c|c|c|r|r|r|}
 		\hline
-		Tag&Length&Loss&Optim&Batch size&Error valid&Epochs\\
+		No&Tag&Length&Loss&Batch size&Error valid&Epochs\\
 		\hline
-		BMES&2-1-0&cat\_cross&adam&512&0.616&483\\ 
+		1&BMES&2-1-0&cat\_cross&512&0.616&483\\ 
 		\hline
-		BM&2-1-0&bin\_cross&adam&1024&0.262&475\\
+		2&BM&2-1-0&bin\_cross&1024&0.262&475\\
 		\hline
-		BM&2-1-0&cat\_cross&adam&1024&0.261&543\\
+		3&BM&2-1-0&cat\_cross&1024&0.261&543\\
 		\hline
-		BM&2-1-1&bin\_cross&adam&1024&0.063&247\\
+		4&BM&2-1-1&bin\_cross&1024&0.063&247\\
 		\hline
-		BM&2-1-2&bin\_cross&adam&1024&0.050&213\\
+		5&BM&2-1-2&bin\_cross&1024&0.050&213\\
+		\hline
+		6&BM&3-1-3&bin\_cross&1024&0.047&223\\
+		\hline
+		7&BMES&2-1-2&cat\_cross&1024&0.107&389\\
+		\hline
+		8&BMES&3-1-3&cat\_cross&1024&0.090&769\\
 		\hline
 	\end{tabular}
 	\caption{Előrecsatolt háló tanítása különböző paraméterekkel}
 \end{table}
+\subsection{Rekurrens neurális hálók}
+
 \bibliographystyle{plain}
 \bibliography{references}
 
