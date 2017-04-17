@@ -221,18 +221,18 @@ if __name__ == "__main__":
     for length_after in range(1,6):
         window_length = length_after*2+1
         
+
+        # Data read and network data generate
+        counter_hu_data = data_reader('web2.2-freq-sorted.txt')
+        [train_input_flatten, train_target,
+         valid_input_flatten, valid_target,
+         tests_input_flatten, tests_target] = train_data_generator(counter_hu_data,
+                                                                   window_length, 
+                                                                   length_after, 
+                                                                   tag_chars)
+
         for num_layers in range(2,12):
             for num_hidden in range(10,101,10):
-                # Data read and network data generate
-                counter_hu_data = data_reader('web2.2-freq-sorted.txt')
-                [train_input_flatten, train_target,
-                 valid_input_flatten, valid_target,
-                 tests_input_flatten, tests_target] = train_data_generator(counter_hu_data,
-                                                                           window_length, 
-                                                                           length_after, 
-                                                                           tag_chars)
-
-
                 # Creating the keras model
                 model = model_creator(window_length,len(tag_chars),num_layers,num_hidden)
                 print('Model created. Start training...')
