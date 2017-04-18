@@ -105,14 +105,15 @@ def model_creator(window_length, output_length, num_layers=1,
     and layer number, hidden layer length"""
     model = Sequential()
     model.add(Dense(input_dim=((window_length)*len(chars)),
-                    units=num_hidden, name='input_layer', activation='sigmoid'))
-    for i in range(1,num_layers):
+                    units=num_hidden, name='input_layer',
+                    activation='sigmoid'))
+    for i in range(1, num_layers):
         model.add(Dense(units=num_hidden, activation='sigmoid'))
 
     # model.add(Flatten())
     model.add(Dense(output_length, name='output_layer', activation='softmax'))
 
-    if(output_length==2):
+    if(output_length == 2):
         model.compile(loss='binary_crossentropy', optimizer='adam')
     else:
         model.compile(loss='categorical_crossentropy', optimizer='adam')
@@ -122,7 +123,7 @@ def model_creator(window_length, output_length, num_layers=1,
 def data_reader(file, tail_cut=100000):
     """Read data from file"""
 
-    tail_cut_ptest_words =tail_cut+500
+    tail_cut_ptest_words = tail_cut + 500
 
     counter_hu_data = collections.Counter()
     with open('web2.2-freq-sorted.txt', 'r',
@@ -139,27 +140,27 @@ def data_reader(file, tail_cut=100000):
     return counter_hu_data
 
 
-def train_data_generator(data_counter, window_length, length_after, 
+def train_data_generator(data_counter, window_length, length_after,
                          tag_chars='BM', tail_cut=100000):
     """Generate training data from counter data"""
-    
+
     word_list = []
     c_all = 0
     c_same_char_num = 0
-    
+
     for words in data_counter.most_common(tail_cut):
         c_all += 1
         next_word = words[0]
         if(len(next_word) != 0 and same_char_num(next_word)):
             c_same_char_num += 1
-            if(len(tag_chars)==2):
-                word_list.append([next_word, 
+            if(len(tag_chars) == 2):
+                word_list.append([next_word,
                                   hyph_tags_4to2(hyph_tags(next_word))])
             else:
                 word_list.append([next_word, hyph_tags(next_word)])
     print('Data read successfully')
     print(c_same_char_num, c_all, c_same_char_num/c_all)
-    
+
     # Generate network data
     data_in = []
     data_out = []
@@ -173,7 +174,6 @@ def train_data_generator(data_counter, window_length, length_after,
             wrong_word += 1
     print('Data len: ', len(data_in))
     print('Wrong words: ', wrong_word)
-    
 
     valid_rate = 0.2
     test_rate = 0.1
@@ -190,12 +190,11 @@ def train_data_generator(data_counter, window_length, length_after,
                             int(data_len*(test_rate+valid_rate))]
     train_input = data_in[int(data_len*(test_rate+valid_rate)):]
     train_target = data_out[int(data_len*(test_rate+valid_rate)):]
-    
-    
-    print('Training data size:', np.shape(train_input), np.shape(train_target))
-    print('Validation data size:', np.shape(valid_input), np.shape(valid_target))
-    print('Test data size:', np.shape(tests_input), np.shape(tests_target))
 
+    print('Training data size:', np.shape(train_input), np.shape(train_target))
+    print('Validation data size:', np.shape(valid_input),
+          np.shape(valid_target))
+    print('Test data size:', np.shape(tests_input), np.shape(tests_target))
 
     train_input_flatten = np.reshape(
         train_input, (len(train_input), (window_length)*len(hun_chars)))
@@ -204,7 +203,7 @@ def train_data_generator(data_counter, window_length, length_after,
     tests_input_flatten = np.reshape(
         tests_input, (len(tests_input), (window_length)*len(hun_chars)))
     print('Network data generated successfully')
-    
+
     return [train_input_flatten, train_target,
             valid_input_flatten, valid_target,
             tests_input_flatten, tests_target]
@@ -218,23 +217,24 @@ if __name__ == "__main__":
     num_layers = 2
     num_hidden = 10
 
-    for length_after in range(1,6):
+    for length_after in range(1, 6):
         window_length = length_after*2+1
-        
 
         # Data read and network data generate
         counter_hu_data = data_reader('web2.2-freq-sorted.txt')
         [train_input_flatten, train_target,
          valid_input_flatten, valid_target,
-         tests_input_flatten, tests_target] = train_data_generator(counter_hu_data,
-                                                                   window_length, 
-                                                                   length_after, 
-                                                                   tag_chars)
+         tests_input_flatten,
+         tests_target] = train_data_generator(counter_hu_data,
+                                              window_length,
+                                              length_after,
+                                              tag_chars)
 
-        for num_layers in range(2,12):
-            for num_hidden in range(10,101,10):
+        for num_layers in range(2, 12):
+            for num_hidden in range(10, 101, 10):
                 # Creating the keras model
-                model = model_creator(window_length,len(tag_chars),num_layers,num_hidden)
+                model = model_creator(window_length, len(tag_chars),
+                                      num_layers, num_hidden)
                 print('Model created. Start training...')
 
                 earlyStopping = keras.callbacks.EarlyStopping(
@@ -242,25 +242,30 @@ if __name__ == "__main__":
 
                 history = model.fit(train_input_flatten, train_target,
                                     epochs=1000, batch_size=1024,
-                                    validation_data=(valid_input_flatten, valid_target),
+                                    validation_data=(valid_input_flatten,
+                                                     valid_target),
                                     verbose=0, callbacks=[earlyStopping])
-    
+
                 print('Training done')
 
                 test_results = model.predict(tests_input_flatten)
                 test_success = 0
                 test_fail = 0
                 for i in range(len(test_results)):
-                    if np.argmax(test_results[i])==np.argmax(tests_target[i]):
-                        test_success +=1
+                    if np.argmax(test_results[i]) == np.argmax(tests_target[i]):
+                        test_success += 1
                     else:
-                        test_fail +=1
+                        test_fail += 1
 
                 with open("results.txt", "a") as myfile:
-                	result = ""
-                	result += str(window_length) + '\t' + str(length_after) + '\t' + tag_chars
-                	result += '\t' + str(num_layers) + '\t' + str(num_hidden) + '\t'
-                	result += str(history.epoch[-1]) + '\t' + str(history.history['val_loss'][-1])
-                	result += '\t' + str(test_fail/(test_fail+test_success)) + '\n'
-                	myfile.write(result)
+                    result = ""
+                    result += str(window_length) + '\t'
+                    result += str(length_after) + '\t' + tag_chars
+                    result += '\t' + str(num_layers) + '\t'
+                    result += str(num_hidden) + '\t'
+                    result += str(history.epoch[-1]) + '\t'
+                    result += str(history.history['val_loss'][-1])
+                    result += '\t' + str(test_fail/(test_fail+test_success))
+                    result += '\n'
+                    myfile.write(result)
 
