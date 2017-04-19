@@ -11,12 +11,11 @@
 \author{N{\'e}meth Gergely D{\'a}niel}
 \date{}
 
+
+
 \begin{document}
 \fontfamily{ptm}\selectfont
 \maketitle
-
-
-
 \selectlanguage{english}
 \begin{abstract}
 
@@ -25,18 +24,20 @@
 \begin{abstract}
 	
 \end{abstract}
-
+\newpage
+\tableofcontents
+\newpage
 \section{Bevezetés}
 \section{Szótagoló programok}
 Az elterjedt szótagoló algoritmusok kétféle csoportba bonthatóak: szabály- vagy szótáralapúak. A szabad szoftverek világában \textit{de facto} a \TeX szótagolási algoritmusát használják.
 
-A \TeX\,eredeti szótagoló algoritmusát Prof. Knuth tervezte 1977 nyarán\cite{knuth1979tex}. Ez három fő szótagolási szabályt alkalmazott: $1)$ utótag leválasztás, $2)$ előtag leválasztás és $3)$ magánhangzó - mássalhangzó - mássalhangzó - magánhangzó (vccv) elválasztás, azaz ha ilyen betűnégyes található a szóban, legtöbb esetben a mássalhangzók mentén elválasztható. Ez a három szabály gyakran alkalmazható, azonban már az első algoritmusban kiegészült kisebb szabályokkal (,,break vowel-q" vagy ,,break after ck") és kivételek listájával(300 szó).
+A \TeX\,eredeti szótagoló algoritmusát Prof. Knuth tervezte 1977 nyarán \cite{knuth1979tex}. Ez három fő szótagolási szabályt alkalmazott: $1)$ utótag leválasztás, $2)$ előtag leválasztás és $3)$ magánhangzó - mássalhangzó - mássalhangzó - magánhangzó (vccv) elválasztás, azaz ha ilyen betűnégyes található a szóban, legtöbb esetben a mássalhangzók mentén elválasztható. Ez a három szabály gyakran alkalmazható, azonban már az első algoritmusban kiegészült kisebb szabályokkal (,,break vowel-q" vagy ,,break after ck") és kivételek listájával(300 szó).
 
-A \TeX82 verzióhoz megjelent Liang szótagoló algoritmusa\cite{liang1983word}, aminek legfontosabb újítása a minta(\textit{patterns}) alapú szótagolás bevezetése volt. Ennek lényege, hogy a szótagolási szabályok mintákra definiálódtak és az algoritmus a szótagolás során ezeket a mintákat keresi a szóban.
+A \TeX82 verzióhoz megjelent Liang szótagoló algoritmusa \cite{liang1983word}, aminek legfontosabb újítása a minta(\textit{patterns}) alapú szótagolás bevezetése volt. Ennek lényege, hogy a szótagolási szabályok mintákra definiálódtak és az algoritmus a szótagolás során ezeket a mintákat keresi a szóban.
 
-A \TeX\,jelenlegi verziójában a Hunspell szótagoló algoritmust alkalmazzák\cite{nemeth2006automatic}. Ez az eljárás Liang algoritmusán alapszik, amit nyelvfüggő speciális szótagolási kiterjesztésekkel (\textit{non-standard hyphenation extension}) egészít ki.
+A \TeX\,jelenlegi verziójában a Hunspell szótagoló algoritmust alkalmazzák \cite{nemeth2006automatic}. Ez az eljárás Liang algoritmusán alapszik, amit nyelvfüggő speciális szótagolási kiterjesztésekkel (\textit{non-standard hyphenation extension}) egészít ki.
 \subsection{Liang algoritmusa}
-Liang szótagoló algoritmusának alapját a szótagolási minták alkotják\cite{liang1983word}. Az algoritmust az angol 
+Liang szótagoló algoritmusának alapját a szótagolási minták alkotják \cite{liang1983word}. Az algoritmust az angol 
 {\fontfamily{pcr}\selectfont
 	hyphenation%
 } elválasztását az alábbi módon végzi:
@@ -50,9 +51,9 @@ Ezután a szó elejére és végére illeszt egy pont  jelző karaktert. Ennek j
 	\end{center}
 }
 Ezt követően a minták között keres illeszkedést. A \textit{hyphenation} szóra ezek az alábbiak: 
-{\fontfamily{pcr}\selectfont hy3ph, he2n, hena4, hen5at, 1na, n2at, 1tio,  2io} \cite[37.\ oldal]{liang1983word}
+{\fontfamily{pcr}\selectfont hy3ph, he2n, hena4, hen5at, 1na, n2at, 1tio,  2io}  \cite[37.\ oldal]{liang1983word}
 A megfelelő mintákat ráillesztve a szóra, a bennük szereplő számokat a szó karakterei közé szúrva az \ref{liang-hyp}. ábrán szereplőket kapjuk.%
-\footnote{Az ábrázolásmód N{\'e}meth cikkéből származik\cite{nemeth2006automatic}.}
+\footnote{Az ábrázolásmód N{\'e}meth cikkéből származik \cite{nemeth2006automatic}.}
 \begin{figure}[h]\centering
 	{\fontfamily{pcr}\selectfont
 		\setlength{\tabcolsep}{0pt}
@@ -119,19 +120,23 @@ A gépi tanulás területén egyre nagyobb teret nyernek a deep learning alapú 
 A mély tanulás bevetését a nyelvtechnológia területén az a tény élteti, hogy az elektronikus kommunikáció korában jelentős mennyiségű nyelvi adatbázisok állnak rendelkezésünkre, így a deep learning legfontosabb eleme, a megfelelő méretű tanulóadat elérhető. Az ismertetett elválasztási algoritmusok kulcseleme, hogy megfelelő elválasztási mintákat ismerjünk fel az adathalmazon (\textit{korpusz}). A képfelismerés terén sokkal komplexebb minták megtalálásában is jelentős eredményeket értek el a deep learning segítségével, így e módszer bevetése a szótagolás problémakörében megalapozott.
 
 \subsubsection{Keretrendszerek}
-Deep learning rendszerek tervezésénél az utóbbi időben ipari és kutatói területen egyaránt elterjedőben vannak a magas szintű keretrendszerek. Ezek legnagyobb előnye, hogy az aktív fejlesztői közösség a gyorsan fejlődő tudományág eredményeit alkalmazható technológiákként tárja a felhasználók elé. A jelentősebb keretrendszerek: TensorFlow\footnote{TensorFlow: https://www.tensorflow.org/}, Torch7\footnote{Torch7: http://torch.ch/}, Keras\footnote{Keras: https://keras.io/}. Az itt ismertetett eljárások megvalósításához a Keras nyújtotta lehetőségekkel valósultak meg\cite{chollet2015keras}. 
-\subsection{Előrecsatolt neurális hálók}
+Deep learning rendszerek tervezésénél az utóbbi időben ipari és kutatói területen egyaránt elterjedőben vannak a magas szintű keretrendszerek. Ezek legnagyobb előnye, hogy az aktív fejlesztői közösség a gyorsan fejlődő tudományág eredményeit alkalmazható technológiákként tárja a felhasználók elé. A jelentősebb keretrendszerek: TensorFlow\footnote{TensorFlow: https://www.tensorflow.org/}, Torch7\footnote{Torch7: http://torch.ch/}, Keras\footnote{Keras: https://keras.io/}. Az itt ismertetett eljárások megvalósításához a Keras nyújtotta lehetőségekkel valósultak meg \cite{chollet2015keras}.
+\subsection{Tanító adatok}
+Mély tanulás esetén az eredmény minőségét alapvetően meghatározza a tanítóhalmaz minősége. Jelen esetben a korpuszok és azok megfelelő szótagoltsága.
+
+A hálótervezés során a Magyar Webkorpusz leggyakoribb $100000$ szaván kísérleteztünk \cite{halacsy2004creating,kornai2006web}.
+\section{Előrecsatolt neurális hálók}
 A neurális háló lényege ebben ez esetben az, hogy a szó minden karakterére eldöntsük a környezetében lévő karakterek segítségével, hogy a karakternél van-e elválasztás.
 
 A szavakat minden karakter mentén felbontjuk az adott ablakméretre, majd ezekre az ablakokra tanítva oldunk meg egy osztályozó problémát, ami ad egy címkét a karakternek és a címke alapján végezzük az elválasztást.
-\subsubsection{Karakter címkézés}
+\subsection{Karakter címkézés}
 Kétféle címkézést használunk. Az első eset előnye, hogy több címke van így több információt adunk át a modellnek, a másodiké pedig, hogy a jósolt címkézés minden esetben elválasztássá alakítható. Ez a BMES esetében nem teljesül: ha két karakterre egymás után E-t jósol, az nem alakítható rögtön valós elválasztássá. 
 \paragraph{BMES}
 \begin{itemize}
-	\item B - Begin, szótag elején álló karakter
-	\item M - Middle, közepén lévő karakter, se előtte, se utána nincs elválasztás
-	\item E - End, a karakter után elválasztás van
-	\item S - Single, egy karakterből álló szótag
+	\item B: Begin, szótag elején álló karakter
+	\item M: Middle, közepén lévő karakter, se előtte, se utána nincs elválasztás
+	\item E: End, a karakter után elválasztás van
+	\item S: Single, egy karakterből álló szótag
 \end{itemize}
 A
 {\fontfamily{pcr}\selectfont
@@ -143,8 +148,8 @@ szó címkézése:
 }
 \paragraph{BM}
 \begin{itemize}
-	\item B - Begin, szótag elején álló karakter
-	\item M - Minden egyéb eset
+	\item B: Begin, szótag elején álló karakter
+	\item M: Minden egyéb eset
 \end{itemize}
 A
 {\fontfamily{pcr}\selectfont
@@ -154,20 +159,36 @@ szó címkézése:
 {\fontfamily{pcr}\selectfont
 	BMBBMMM%
 }
-\subsubsection{Adat-előkészítés}
-One-hot, flatten, webcorpus
-\subsubsection{Előrecsatolt háló tanítása}
-Az első tanítások eredményei \aref{tab:first_learn}.~táblázatban láthatóak. \Aref{tab:optim}.~táblázat a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
-\paragraph{Az oszlopnevek rövidítései:}
-\begin{description}
-	\item[Length] $a-1-b$ a vizsgált karakter előtt $a$ utána $b$ karaktert veszünk be környezetébe, ami alapján a címkézést végezzük.
-	\item[Tag] a címkézés BM vagy BMES
-	\item[NLayer] a háló rejtett rétegeinek száma
-	\item[NHidden] a rejtett rétegek mérete
-	\item[Val\_loss] a validációs adatok binary(BM) illetve categorical(BMES) crossentropy hibafüggvénnyel számolt hibája
-	\item[Test\_w] maximumkiválasztás után hibás eredményt adó teszt adatok száma
-	\item[Epochs] a tanításhoz szükséges epoch-ok száma. A tanítás végét early stoping módszerrel határoztuk meg.
-\end{description}
+\subsection{Adat-előkészítés}
+Ha az \textit{nyúlanyó} szó \textit{a} karakterét szeretnénk egy $5$-ös szimmetrikus ablakú környezetben tanítóadatnak előkészíteni, \textbf{BM} címkézéssel, akkor az alábbi előkészületeket kell tennünk:
+\subsubsection{Tanítás a karakter környezetéből}
+
+A jelölésrendszerünk alapján az $5$-ös szimmetrikus ablak azt jelenti, hogy a karakter előtt és a karakter után is két-két további karaktert veszünk, és ez alapján az öt karakter alapján próbáljuk meg eldönteni, milyen címke illeszkedik a középső karakterre. Ezt jelöljük \textit{2-1-2}-vel. Az \textit{nyúlanyó} szó és az \textit{a} betű esetén ez \textit{úl\,a\,ny} ablakot jelent.
+
+Ha az ablak túlnyúl a szó szélén, az elterjedt jelölés alapján a szó elején \^\ karaktereket, illetve a szó végén további \$ karaktereket illesztünk az ablakba.
+\subsubsection{One-hot kódolás}
+
+Ahhoz, hogy a karakterekből a keras által feldolgozható tanítóadat legyen, one-hot kódolást végzünk rajta. 
+
+A karakterek esetében ez azt jelenti, hogy a megengedett karaktereket, jelen esetben a magyar ábécé karaktereit és a kezdő-, befejezőkaraktereket egymás után felsoroljuk, majd az adott karaktert úgy reprezentáljuk, hogy egy ezzel azonos hosszúságú tömbben a karakternek megfelelő sorszámú helyre egyest, minden további mezőbe nullást írunk.
+
+A \textbf{BM} illetve \textbf{BMES} címkézést ugyanígy reprezentáljuk egy $2$ avagy $4$ hosszú tömbbel. 
+
+\subsubsection{Lapítás}
+
+Ha a fentieket elvégezzük egy $5$ hosszú ablakra, akkor a magyar ábécét figyelembe véve $5$ darab $35+2$ hosszú tömböt kapunk. A háló bemenetét úgy kapjuk meg, hogy ezt ellapítjuk egy $5\cdot37$ hosszú tömbbé (amiben $5$ helyen $1$-es, minden további helyen $0$-ás szerepel). Ez lesz a tanítóadatunk.
+\subsection{Előrecsatolt háló tanítása}
+Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóak. \Aref{tab:optim}.~táblázat a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
+\subsubsection{A táblázatokban használt rövidítések}
+\begin{itemize}
+	\item Length: \textit{a-1-b} a vizsgált karakter előtt $a$ utána $b$ karaktert veszünk be környezetébe, ami alapján a címkézést végezzük.
+	\item Tag: a címkézés BM vagy BMES
+	\item NLayer: a háló rejtett rétegeinek száma
+	\item NHidden: a rejtett rétegek mérete
+	\item Val\_loss: a validációs adatok binary(BM) illetve categorical(BMES) crossentropy hibafüggvénnyel számolt hibája
+	\item Test\_w: maximumkiválasztás után hibás eredményt adó teszt adatok száma
+	\item Epochs: a tanításhoz szükséges epoch-ok száma. A tanítás végét early stoping módszerrel határoztuk meg.
+\end{itemize}
 \begin{table}[htp]\centering
 	\begin{tabular}{|r|c|c|c|r|r|r|}
 		\hline
@@ -191,7 +212,7 @@ Az első tanítások eredményei \aref{tab:first_learn}.~táblázatban látható
 		\hline
 	\end{tabular}
 	\caption{Előrecsatolt háló tanítása különböző paraméterekkel}
-	\label{tab:first_learn}
+	\label{tab:firstlearn}
 \end{table}
 \begin{small}
 \begin{table}[p]
@@ -272,7 +293,7 @@ Az első tanítások eredményei \aref{tab:first_learn}.~táblázatban látható
 	\label{tab:optim}
 \end{table}
 \end{small}
-\subsection{Rekurrens neurális hálók}
+\section{Rekurrens neurális hálók}
 
 \bibliographystyle{plain}
 \bibliography{references}
