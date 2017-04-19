@@ -98,6 +98,8 @@ A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és ha
 	szemüveggel
 	
 	hasizom
+	
+	messze
 \end{checkhyphens} 		
 \end{minipage}\noindent
 \begin{minipage}{0.5\textwidth}
@@ -105,7 +107,8 @@ A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és ha
 
 	a-u-tó-val\\
 	szem-ü-veg-gel\\
-	has-i-zom
+	has-i-zom\\
+	mesz-sze
 \end{minipage}
 
 
@@ -154,10 +157,21 @@ szó címkézése:
 \subsubsection{Adat-előkészítés}
 One-hot, flatten, webcorpus
 \subsubsection{Előrecsatolt háló tanítása}
-\begin{table}[h]\centering
+Az első tanítások eredményei \aref{tab:first_learn}.~táblázatban láthatóak. \Aref{tab:optim}.~táblázat a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
+\paragraph{Az oszlopnevek rövidítései:}
+\begin{description}
+	\item[Length] $a-1-b$ a vizsgált karakter előtt $a$ utána $b$ karaktert veszünk be környezetébe, ami alapján a címkézést végezzük.
+	\item[Tag] a címkézés BM vagy BMES
+	\item[NLayer] a háló rejtett rétegeinek száma
+	\item[NHidden] a rejtett rétegek mérete
+	\item[Val\_loss] a validációs adatok binary(BM) illetve categorical(BMES) crossentropy hibafüggvénnyel számolt hibája
+	\item[Test\_w] maximumkiválasztás után hibás eredményt adó teszt adatok száma
+	\item[Epochs] a tanításhoz szükséges epoch-ok száma. A tanítás végét early stoping módszerrel határoztuk meg.
+\end{description}
+\begin{table}[htp]\centering
 	\begin{tabular}{|r|c|c|c|r|r|r|}
 		\hline
-		No&Tag&Length&Loss&Batch size&Error valid&Epochs\\
+		No&Tag&Length&Loss&Batch size&Val\_loss&Epochs\\
 		\hline
 		1&BMES&2-1-0&cat\_cross&512&0.616&483\\ 
 		\hline
@@ -177,7 +191,87 @@ One-hot, flatten, webcorpus
 		\hline
 	\end{tabular}
 	\caption{Előrecsatolt háló tanítása különböző paraméterekkel}
+	\label{tab:first_learn}
 \end{table}
+\begin{small}
+\begin{table}[p]
+	\begin{tabular}{|l|c|r|r|r|r|r|r|}
+		\hline
+		No&Tag&Length&NLayer&NHidden&Epochs&Val\_loss&Test\_w\\
+		\hline
+		2.1&BM&2-1-2&2&10&308&0.05025&0.01568\\
+		\hline
+		2.2&BM&2-1-2&2&20&250&0.04454&0.01352\\
+		\hline
+		2.3&BM&2-1-2&2&30&189&0.04274&0.01264\\
+		\hline
+		2.4&BM&2-1-2&2&40&170&0.04151&0.01185\\
+		\hline
+		2.5&BM&2-1-2&2&50&196&0.04207&0.01129\\
+		\hline
+		2.6&BM&2-1-2&2&60&167&0.04068&0.01119\\
+		\hline
+		2.7&BM&2-1-2&2&70&166&0.04155&0.01122\\
+		\hline
+		2.8&BM&2-1-2&2&80&175&0.03994&0.01073\\
+		\hline
+		2.9&BM&2-1-2&2&90&179&0.03962&0.01050\\
+		\hline
+		2.10&BM&2-1-2&2&100&145&0.03911&0.01100\\
+		\hline
+		3.7&BM&2-1-2&3&70&176&0.04221&0.01155\\
+		\hline
+		3.8&BM&2-1-2&3&80&161&0.03881&0.01095\\
+		\hline
+		3.9&BM&2-1-2&3&90&171&0.03872&0.01037\\
+		\hline
+		3.10&BM&2-1-2&3&100&178&0.03886&0.01062\\
+		\hline
+		4.7&BM&2-1-2&4&70&208&0.04024&0.01116\\
+		\hline
+		4.8&BM&2-1-2&4&80&171&0.03995&0.01077\\
+		\hline
+		4.9&BM&2-1-2&4&90&177&0.03894&0.01077\\
+		\hline
+		4.10&BM&2-1-2&4&100&177&0.03885&0.01090\\
+		\hline
+		5.4&BM&2-1-2&5&40&199&0.04423&0.01225\\
+		\hline
+		5.5&BM&2-1-2&5&50&205&0.03992&0.01136\\
+		\hline
+		5.6&BM&2-1-2&5&60&220&0.03955&0.01090\\
+		\hline
+		5.7&BM&2-1-2&5&70&179&0.04013&0.01063\\
+		\hline
+		\textbf{5.8}&\textbf{BM}&\textbf{2-1-2}&\textbf{5}&\textbf{80}&\textbf{207}&\textbf{0.03937}&\textbf{0.01032}\\
+		\hline
+		5.9&BM&2-1-2&5&90&218&0.03995&0.01076\\
+		\hline
+		5.10&BM&2-1-2&5&100&186&0.03927&0.01092\\
+		\hline
+		6.7&BM&2-1-2&6&70&202&0.04186&0.01149\\
+		\hline
+		6.8&BM&2-1-2&6&80&218&0.04048&0.01076\\
+		\hline
+		6.9&BM&2-1-2&6&90&157&0.04715&0.01221\\
+		\hline
+		6.10&BM&2-1-2&6&100&217&0.03926&0.01072\\
+		\hline
+		7.7&BM&2-1-2&7&70&254&0.04432&0.01218\\
+		\hline
+		7.8&BM&2-1-2&7&80&221&0.04335&0.01169\\
+		\hline
+		7.9&BM&2-1-2&7&90&224&0.03943&0.01046\\
+		\hline
+		7.10&BM&2-1-2&7&100&210&0.04165&0.01198\\
+		\hline
+	\end{tabular}
+
+	
+	\caption{Hiperparaméter optimalizálás}
+	\label{tab:optim}
+\end{table}
+\end{small}
 \subsection{Rekurrens neurális hálók}
 
 \bibliographystyle{plain}
