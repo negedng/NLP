@@ -6,6 +6,7 @@
 \usepackage{testhyphens}
 \usepackage{multirow}
 
+
 %opening
 \title{Deep learning alapú szótagolás}
 \author{N{\'e}meth Gergely D{\'a}niel}
@@ -54,7 +55,7 @@ Ezt követően a minták között keres illeszkedést. A \textit{hyphenation} sz
 {\fontfamily{pcr}\selectfont hy3ph, he2n, hena4, hen5at, 1na, n2at, 1tio,  2io}  \cite[37.\ oldal]{liang1983word}
 A megfelelő mintákat ráillesztve a szóra, a bennük szereplő számokat a szó karakterei közé szúrva az \ref{liang-hyp}. ábrán szereplőket kapjuk.%
 \footnote{Az ábrázolásmód N{\'e}meth cikkéből származik \cite{nemeth2006automatic}.}
-\begin{figure}[h]\centering
+\begin{figure}[ht]\centering
 	{\fontfamily{pcr}\selectfont
 		\setlength{\tabcolsep}{0pt}
 		\begin{tabular}{rrrrrrrrrrrrr}
@@ -178,7 +179,11 @@ A \textbf{BM} illetve \textbf{BMES} címkézést ugyanígy reprezentáljuk egy $
 
 Ha a fentieket elvégezzük egy $5$ hosszú ablakra, akkor a magyar ábécét figyelembe véve $5$ darab $35+2$ hosszú tömböt kapunk. A háló bemenetét úgy kapjuk meg, hogy ezt ellapítjuk egy $5\cdot37$ hosszú tömbbé (amiben $5$ helyen $1$-es, minden további helyen $0$-ás szerepel). Ez lesz a tanítóadatunk.
 \subsection{Előrecsatolt háló tanítása}
-Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóak. \Aref{tab:optim}.~táblázat a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
+Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóak.
+
+\Aref{tab:optim}.~táblázat a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
+
+\Aref{tab:winoptim}.~táblázatban a karakter címkézéséhez körülötte megvizsgált karakterek számát változtattuk. Jól látható, hogy egy-egy karakter bevétele még jóval kevesebb információt árul el a címkézésről, mint a többi. Hasonlóképp észrevehető, hogy a túl nagy ablak is ront a helyzeten. Ez azért jelenik meg, mivel a nagyobb ablakok bevezetésével egyre ritkábbak lesznek az adott típusú minták előfordulása az adatokban.
 \subsubsection{A táblázatokban használt rövidítések}
 \begin{itemize}
 	\item Length: \textit{a-1-b} a vizsgált karakter előtt $a$ utána $b$ karaktert veszünk be környezetébe, ami alapján a címkézést végezzük.
@@ -193,7 +198,7 @@ Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóa
 	\begin{tabular}{|r|c|c|c|r|r|r|}
 		\hline
 		No&Tag&Length&Loss&Batch size&Val\_loss&Epochs\\
-		\hline
+		\hline\hline
 		1&BMES&2-1-0&cat\_cross&512&0.616&483\\ 
 		\hline
 		2&BM&2-1-0&bin\_cross&1024&0.262&475\\
@@ -215,11 +220,11 @@ Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóa
 	\label{tab:firstlearn}
 \end{table}
 \begin{small}
-\begin{table}[p]
+\begin{table}[tp]\centering
 	\begin{tabular}{|l|c|r|r|r|r|r|r|}
 		\hline
 		No&Tag&Length&NLayer&NHidden&Epochs&Val\_loss&Test\_w\\
-		\hline
+		\hline\hline
 		2.1&BM&2-1-2&2&10&308&0.05025&0.01568\\
 		\hline
 		2.2&BM&2-1-2&2&20&250&0.04454&0.01352\\
@@ -291,6 +296,77 @@ Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóa
 	
 	\caption{Hiperparaméter optimalizálás}
 	\label{tab:optim}
+\end{table}
+\end{small}
+\begin{small}
+\begin{table}[tp]\centering
+\begin{tabular}{|l|c|r|r|r|r|r|r|}
+			\hline
+			No&Tag&Length&NLayer&NHidden&Epochs&Val\_loss&Test\_w\\
+\hline\hline
+3.6&BM&1-1-1&5&60&303&0.09159&0.03617\\
+\hline
+3.7&BM&1-1-1&5&70&303&0.09156&0.03634\\
+\hline
+3.8&BM&1-1-1&5&80&229&0.09155&0.03582\\
+\hline
+3.9&BM&1-1-1&5&90&252&0.09137&0.03544\\
+\hline
+3.10&BM&1-1-1&5&100&196&0.09281&0.03595\\
+\hline
+3.11&BM&1-1-1&5&110&249&0.09129&0.03601\\
+\hline
+5.6&BM&2-1-2&5&60&222&0.04062&0.01113\\
+\hline
+5.7&BM&2-1-2&5&70&202&0.03969&0.01069\\
+\hline
+5.8&BM&2-1-2&5&80&222&0.04209&0.01099\\
+\hline
+5.9&BM&2-1-2&5&90&214&0.03992&0.01070\\
+\hline
+5.10&BM&2-1-2&5&100&198&0.03950&0.01049\\
+\hline
+5.11&BM&2-1-2&5&110&190&0.03995&0.01052\\
+\hline
+7.6&BM&3-1-3&5&60&133&0.03853&0.00988\\
+\hline
+7.7&BM&3-1-3&5&70&131&0.04250&0.01096\\
+\hline
+7.8&BM&3-1-3&5&80&147&0.04433&0.01245\\
+\hline
+7.9&BM&3-1-3&5&90&149&0.03865&0.00982\\
+\hline
+7.10&BM&3-1-3&5&100&137&0.03813&0.00972\\
+\hline
+\textbf{7.11}&BM&\textbf{3-1-3}&\textbf{5}&\textbf{110}&\textbf{136}&\textbf{0.03926}&\textbf{0.00952}\\
+\hline
+9.6&BM&4-1-4&5&60&121&0.03903&0.01005\\
+\hline
+9.7&BM&4-1-4&5&70&119&0.04316&0.01143\\
+\hline
+9.8&BM&4-1-4&5&80&125&0.04126&0.01104\\
+\hline
+9.9&BM&4-1-4&5&90&118&0.03934&0.01052\\
+\hline
+9.10&BM&4-1-4&5&100&116&0.03831&0.01072\\
+\hline
+9.11&BM&4-1-4&5&110&126&0.03967&0.01082\\
+\hline
+11.6&BM&5-1-5&5&60&112&0.04542&0.01183\\
+\hline
+11.7&BM&5-1-5&5&70&111&0.04082&0.01087\\
+\hline
+11.8&BM&5-1-5&5&80&119&0.04566&0.01220\\
+\hline
+11.9&BM&5-1-5&5&90&99&0.04360&0.01005\\
+\hline
+11.10&BM&5-1-5&5&100&103&0.04013&0.01035\\
+\hline
+11.11&BM&5-1-5&5&110&98&0.04117&0.01064\\
+\hline
+\end{tabular}
+\caption{Karakter-környezet ablak méretének optimalizálása}
+\label{tab:winoptim}
 \end{table}
 \end{small}
 \section{Rekurrens neurális hálók}
