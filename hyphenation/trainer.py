@@ -206,7 +206,7 @@ def train_data_generator(data_counter, window_length, length_after,
 
     return [train_input_flatten, train_target,
             valid_input_flatten, valid_target,
-            tests_input_flatten, tests_target]
+            tests_input_flatten, tests_target, word_list]
 
 
 if __name__ == "__main__":
@@ -225,7 +225,8 @@ if __name__ == "__main__":
         [train_input_flatten, train_target,
          valid_input_flatten, valid_target,
          tests_input_flatten,
-         tests_target] = train_data_generator(counter_hu_data,
+         tests_target,
+         word_list] = train_data_generator(counter_hu_data,
                                               window_length,
                                               length_after,
                                               tag_chars)
@@ -249,13 +250,38 @@ if __name__ == "__main__":
                 print('Training done')
 
                 test_results = model.predict(tests_input_flatten)
-                test_success = 0
-                test_fail = 0
-                for i in range(len(test_results)):
-                    if np.argmax(test_results[i]) == np.argmax(tests_target[i]):
-                        test_success += 1
-                    else:
-                        test_fail += 1
+                test_tp = 0
+                test_fp = 0
+                test_tn = 0
+                test_fn = 0
+                test_str = ""
+                if(np.shape(test_results)[1] == 2):
+                    for i in range(len(test_results)):
+                        # positive
+                        if np.argmax(test_results[i]) == 1:
+                            if np.argmax(tests_target[i] == 1):
+                                test_tp += 1
+                            else:
+                                test_fp += 1
+                        else:
+                            if np.argmax(tests_target[i] == 1):
+                                test_fn += 1
+                            else:
+                                test_tn += 1
+                    test_precision = test_tp / (test_tp + test_fp)
+                    test_recall = test_tp / (test_tp + test_fn)
+                    test_Fscore = 2 * (test_precision * 
+                                       test_recall) / (test_precision +
+                                                       test_recall)
+                    test_str = str(test_precision) + '\t' + str(test_recall) 
+                    test_str += '\t' + str(test_Fscore)
+                else:
+                    for i in range(len(test_results)):
+                        if np.argmax(test_results[i]) == np.argmax(tests_target[i]):
+                            test_success += 1
+                        else:
+                            test_fail += 1
+                    test_str = str(test_fail/(test_fail+test_success))
 
                 with open("results.txt", "a") as myfile:
                     result = ""
@@ -265,7 +291,7 @@ if __name__ == "__main__":
                     result += str(num_hidden) + '\t'
                     result += str(history.epoch[-1]) + '\t'
                     result += str(history.history['val_loss'][-1])
-                    result += '\t' + str(test_fail/(test_fail+test_success))
+                    result += '\t' + test_str
                     result += '\n'
                     myfile.write(result)
 
