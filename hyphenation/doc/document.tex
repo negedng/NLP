@@ -5,26 +5,68 @@
 \usepackage[T1]{fontenc}
 \usepackage{testhyphens}
 \usepackage{multirow}
+\usepackage{graphicx}
 
+%--------------------------------------------------------------------------------------
+% Main variables
+%--------------------------------------------------------------------------------------
+\newcommand{\vikszerzo}{Németh Gergely Dániel}
+\newcommand{\vikkonzulens}{Ács Judit}
+\newcommand{\vikcim}{Deep Learning alapú szótagolás}
+\newcommand{\viktanszek}{Automatizálási és Alkalmazott Informatikai Tanszék}
+\newcommand{\vikdoktipus}{Önnáló laboratórium}
 
-%opening
-\title{Deep learning alapú szótagolás}
-\author{N{\'e}meth Gergely D{\'a}niel}
-\date{}
-
-
-
+\newcommand{\secref}[1]{\aref{#1}.~fejezet}
+\newcommand{\figref}[1]{\aref{#1}.~ábr}
+\newcommand{\tabref}[1]{\aref{#1}.~táblázat}
+\newcommand{\Secref}[1]{\Aref{#1}.~fejezet}
+\newcommand{\Figref}[1]{\Aref{#1}.~ábr}
+\newcommand{\Tabref}[1]{\Aref{#1}.~táblázat}
+%--------------------------------------------------------------------------------------
+%	The title page
+%--------------------------------------------------------------------------------------
 \begin{document}
+\selectlanguage{magyar}
+
+\begin{titlepage}
+	\begin{center}
+		\includegraphics[width=60mm,keepaspectratio]{figures/BMElogo.png}\\
+		\vspace{0.3cm}
+		\textbf{Budapesti Műszaki és Gazdaságtudományi Egyetem}\\
+		\textmd{Villamosmérnöki és Informatikai Kar}\\
+		\textmd{\viktanszek}\\[5cm]
+		
+		\vspace{0.4cm}
+		{\huge \bfseries \vikcim}\\[0.8cm]
+		\vspace{0.5cm}
+		\textsc{\Large \vikdoktipus}\\[4cm]
+		
+		\begin{tabular}{cc}
+			\makebox[5.5cm]{\emph{Készítette}} & \makebox[5.5cm]{\emph{Konzulens}} \\
+			\makebox[5.5cm]{\vikszerzo} & \makebox[5.5cm]{\vikkonzulens}
+		\end{tabular}
+		
+		\vfill
+		{\large \today}
+	\end{center}
+\end{titlepage}
+
+
+%---
+
+	
 \fontfamily{ptm}\selectfont
-\maketitle
+
 \selectlanguage{english}
 \begin{abstract}
 
 \end{abstract}
+\vfill
 \selectlanguage{magyar}
 \begin{abstract}
 	
 \end{abstract}
+\vfill
 \newpage
 \tableofcontents
 \newpage
@@ -126,12 +168,45 @@ Deep learning rendszerek tervezésénél az utóbbi időben ipari és kutatói t
 Mély tanulás esetén az eredmény minőségét alapvetően meghatározza a tanítóhalmaz minősége. Jelen esetben a korpuszok és azok megfelelő szótagoltsága.
 
 A hálótervezés során a Magyar Webkorpusz leggyakoribb $100000$ szaván kísérleteztünk \cite{halacsy2004creating,kornai2006web}.
-\section{Előrecsatolt neurális hálók}
+
+\section{A feldolgozás folyamata}
+A szótagoló jelenleg magyar nyelvre van tervezve, azonban az eljárás lényege univerzális.
+\begin{figure}[htp]
+	\includegraphics[trim={0 7cm 0 7cm},clip,
+	width=\textwidth]{figures/preprocessing.pdf}
+	\caption{A feldolgozás folyamata}\par\medskip\centering
+	\label{fig:gui}
+\end{figure}
+\subsection{Adattisztítás}
+Az adatfeldolgozás során az alábbi tisztítási eljárásokat végeztem:
+\begin{description}
+	\item[kisbetűsítés] A karaktereket kisbetűssé tettem.
+	\item[speciális karakter szűrés] Az alábbi speciális karaktereket töröltem a szövegből(a \textit{python} {\fontfamily{pcr}\selectfont
+		string.punctuation%
+	} környezetfüggően választja meg ezeket, így máshol eltérhetnek): ! " \# \$ \% \& ' ( ) * + , - . / : ; < = > ? @ [ \\ ] \^{} \_ ` \{ | \} \~{}
+	\item[szám szűrés] A szövegben található számokat töröltem.
+\end{description}
+
+Majd a szavakat egyedivé tettem (egy számlálóban eltárolva az előfordulási gyakoriságot).
+\subsection{Adat szűrés}
+A háló sajnos nem minden előforduló esetet tud kezelni, így a későbbi implementálásig ezeket szűröm.
+
+\textbf{Speciális karakterek:} az adott nyelvre nem jellemző karakterek bezavarhatnak a tanításba, így ezeket célszerű kivenni. A magyar elválasztó esetén csak a magyar ábécé betűit hagytam meg.
+
+\textbf{Kettős betűk:} az osztályozó jellegéből adódóan a plusz karakter bevonásával képződő elválasztást (például a \textit{ssz}-ből \textit{sz-sz}) a hálón kívül dolgozom fel.
+\subsection{Nyelv osztályozó}
+A tanítások kiértékelése során arra a következtetésre jutottam, hogy a hunspell és az én elválasztóm közötti eltérések jelentős része akkor adódik, ha idegen nyelvű szót próbálunk meg elválasztani. Így az elválasztó javításának érdekében egy nyelv osztályozót is bevezettem.
+
+A jelenlegi nyelvválasztó egy egyszerű bigram gyakoriság alapú osztályozó.
+%TODO
+\section{Előrecsatolt neurális háló}
 A neurális háló lényege ebben ez esetben az, hogy a szó minden karakterére eldöntsük a környezetében lévő karakterek segítségével, hogy a karakternél van-e elválasztás.
 
 A szavakat minden karakter mentén felbontjuk az adott ablakméretre, majd ezekre az ablakokra tanítva oldunk meg egy osztályozó problémát, ami ad egy címkét a karakternek és a címke alapján végezzük az elválasztást.
 \subsection{Karakter címkézés}
-Kétféle címkézést használunk. Az első eset előnye, hogy több címke van így több információt adunk át a modellnek, a másodiké pedig, hogy a jósolt címkézés minden esetben elválasztássá alakítható. Ez a BMES esetében nem teljesül: ha két karakterre egymás után E-t jósol, az nem alakítható rögtön valós elválasztássá. 
+Kétféle címkézést használunk. Az első eset előnye, hogy több címke van így több információt adunk át a modellnek, a másodiké pedig, hogy a jósolt címkézés minden esetben elválasztássá alakítható. Ez a BMES esetében nem teljesül: ha két karakterre egymás után E-t jósol, az nem alakítható rögtön valós elválasztássá.
+
+A jelenlegi munkában a BM címkézést elemeztük.
 \paragraph{BMES}
 \begin{itemize}
 	\item B: Begin, szótag elején álló karakter
@@ -161,6 +236,12 @@ szó címkézése:
 	BMBBMMM%
 }
 \subsection{Adat-előkészítés}
+\begin{figure}[htp]
+	\includegraphics[trim={0 6cm 0 4cm},clip,
+	width=\textwidth]{figures/characters.pdf}
+	\caption{Tanítóadat előállítása}\par\medskip\centering
+	\label{fig:char}
+\end{figure}
 Ha az \textit{nyúlanyó} szó \textit{a} karakterét szeretnénk egy $5$-ös szimmetrikus ablakú környezetben tanítóadatnak előkészíteni, \textbf{BM} címkézéssel, akkor az alábbi előkészületeket kell tennünk:
 \subsubsection{Tanítás a karakter környezetéből}
 
@@ -178,13 +259,32 @@ A \textbf{BM} illetve \textbf{BMES} címkézést ugyanígy reprezentáljuk egy $
 \subsubsection{Lapítás}
 
 Ha a fentieket elvégezzük egy $5$ hosszú ablakra, akkor a magyar ábécét figyelembe véve $5$ darab $35+2$ hosszú tömböt kapunk. A háló bemenetét úgy kapjuk meg, hogy ezt ellapítjuk egy $5\cdot37$ hosszú tömbbé (amiben $5$ helyen $1$-es, minden további helyen $0$-ás szerepel). Ez lesz a tanítóadatunk.
-\subsection{Előrecsatolt háló tanítása}
-Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóak.
+\subsection{Tanító-, validációs- és tesztadatok}
+\begin{figure}[htp]
+	\includegraphics[trim={0 9cm 0 7cm},clip,
+	width=\textwidth]{figures/dataflowdefault.pdf}
+	\caption{A kezdeti adatgenerálás}\par\medskip\centering
+	\label{fig:dfdef}
+\end{figure}
+\begin{figure}[htp]
+	\includegraphics[trim={0 8cm 0 7cm},clip,
+	width=\textwidth]{figures/dataflowuwords.pdf}
+	\caption{Egyedi szavak felosztása}\par\medskip\centering
+	\label{fig:dfuwords}
+\end{figure}
+\begin{figure}[htp]
+	\includegraphics[trim={0 8cm 0 7cm},clip,
+	width=\textwidth]{figures/dataflowuchars.pdf}
+	\caption{Egyedi adatok}\par\medskip\centering
+	\label{fig:dfuchars}
+\end{figure}
+\section{Eredmények}
+Az első tanítások eredményei \tabref{tab:firstlearn}ban láthatóak.
 
-\Aref{tab:optim}.~táblázat a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
+\tabref{tab:optim} a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
 
-\Aref{tab:winoptim}.~táblázatban a karakter címkézéséhez körülötte megvizsgált karakterek számát változtattuk. Jól látható, hogy egy-egy karakter bevétele még jóval kevesebb információt árul el a címkézésről, mint a többi. Hasonlóképp észrevehető, hogy a túl nagy ablak is ront a helyzeten. Ez azért jelenik meg, mivel a nagyobb ablakok bevezetésével egyre ritkábbak lesznek az adott típusú minták előfordulása az adatokban.
-\subsubsection{A táblázatokban használt rövidítések}
+\Tabref{tab:winoptim} a karakter címkézéséhez körülötte megvizsgált karakterek számát változtattuk. Jól látható, hogy egy-egy karakter bevétele még jóval kevesebb információt árul el a címkézésről, mint a többi. Hasonlóképp észrevehető, hogy a túl nagy ablak is ront a helyzeten. Ez azért jelenik meg, mivel a nagyobb ablakok bevezetésével egyre ritkábbak lesznek az adott típusú minták előfordulása az adatokban.
+\subsection{A táblázatokban használt rövidítések}
 \begin{itemize}
 	\item Length: \textit{a-1-b} a vizsgált karakter előtt $a$ utána $b$ karaktert veszünk be környezetébe, ami alapján a címkézést végezzük.
 	\item Tag: a címkézés BM vagy BMES
@@ -369,9 +469,9 @@ Az első tanítások eredményei \aref{tab:firstlearn}.~táblázatban láthatóa
 \label{tab:winoptim}
 \end{table}
 \end{small}
-\section{Rekurrens neurális hálók}
-
+\newpage
 \bibliographystyle{plain}
 \bibliography{references}
+\addcontentsline{toc}{section}{Hivatkozások}
 
 \end{document}
