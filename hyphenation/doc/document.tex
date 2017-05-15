@@ -59,18 +59,29 @@
 
 \selectlanguage{english}
 \begin{abstract}
-
+	The machine learning paradigm has a strong inpact in many fields of science. In this document the author uses the deep learning technology in the hyphenation problems. He shows that the new, neural network based method can learn Liang's standard hyphenation algorithm and give the same results in most times. 
+	
+	The method has been developed for the Hungarian language but the it can be implemented in many different languages.
 \end{abstract}
 \vfill
 \selectlanguage{magyar}
 \begin{abstract}
+	A gépi tanulás felhasználására megnőtt az igény számos tudományterületben. Jelen dokumentumban a szerző a szótagolás problémakörében veti be a deep learning technológia nyújtotta megoldásokat. Megmutatja, hogy a Liang-féle elválasztási módszerek \cite{liang1983word} jól közelíthetőek egy egyszerű neurális háló segítségével.
 	
+	Az új elválasztási algoritmus fejlesztése a magyar nyelven történt, azonban a módszer használható számos más nyelv esetén is.
 \end{abstract}
 \vfill
 \newpage
 \tableofcontents
 \newpage
 \section{Bevezetés}
+A magyar szavak elválasztását a gyermekek tizenéves korukban elsajátítják. A helyesírás szabályai nyelvünkben egyértelműen definiálják az elválasztás módját \cite{akademia1959magyar}, melyet hosszas gyakorlás után reflexszerűen tudunk használni és az alapműveltség részeként tekintünk rá.
+
+A magyar elválasztás szerencsére nem környezetfüggő, pusztán a szó ismeretében meg lehet határozni az elválasztását, nem kell a szövegkörnyezetet figyelembe venni. Ezáltal a használt gépi szótagolási eljárások jól használhatóak rá.
+
+A gépi alapú szótagolás jelenleg elválasztási minták illesztésével működik, amelyet a \TeX\,első kiadása óta fejlesztenek. Az elválasztási módszer elég jó ahhoz, hogy saját minta-szabályok összegyűjtésével a Magyar Tudományos Akadémia Nyelvészeti Intézete az online elválasztási tanácsadó portáljához\footnote{Lásd: http://helyesírás.mta.hu/helyesiras/default/hyph} is ezt használja \cite{mihaltz2013helyesiras}.
+
+A Deep Learning paradigmák előretörésével felmerült az igény a nyelvtechnológiai módszerek mélytanulásos megoldására is. A digitális világban fellelhető számos korpusz megfelelő méretű alappal szolgál a módszerhez szükséges tanító adatok előállításához. A szerző munkája során az elválasztás problémáját vizsgálja meg gépi tanulás szempontjából.
 \section{Szótagoló programok}
 Az elterjedt szótagoló algoritmusok kétféle csoportba bonthatóak: szabály- vagy szótáralapúak. A szabad szoftverek világában \textit{de facto} a \TeX szótagolási algoritmusát használják.
 
@@ -131,11 +142,21 @@ elválasztást.
 A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és hatékonysága határozza meg. Csak azok a szavak választódnak el, amelyekre illeszkedik minta és csak azok lesznek jó elválasztások, melyekre jó minta illeszkedik.
 
 \subsection{Hunspell}
+A Hunspell a \TeX\,és az OpenOffice jelenleg használt szótagoló algoritmusa. A Hunspell Liang algoritmusát egészíti ki Sojka eseti elválasztási algoritmusának \cite{sojka1995notes} olvashatóbb verziójával \cite{nemeth2006automatic}.
+
+A speciális elválasztások felismerése a Liang-féle elválasztási mintákkal történik, melyekhez különféle felüldefiniálási kódokat alkottak. Például a német \textit{Zucker} szót a
+{\fontfamily{pcr}\selectfont
+	c1k/k=k%
+} minta mentén felismeri, és a definíció alapján \textit{Zuck-ker} módon szótagolja el. A különböző nyelveken számos eseti elválasztási mintát kell definiálni, így ezek a listák a legkülönbözőbb méreteket ölthetik. Az alábbiakban a magyar példát foglaljuk össze.
+\subsubsection{Magyar eseti elválasztási minták}
+A betűkettőzéssel jelölt többjegyű hosszú mássalhangzókat elválasztás nélkül szó közepén a csak az első karakter kettőzésével jelöljük, azonban elválasztáskor külön-külön kiírjuk mindkét többjegyű mássalhangzót: pl. \textit{ssz, sz-sz} vagy \textit{ccs, cs-cs}. A klasszikus példa: \textit{asz-szony-nyal}
+
+A nehézséget az okozza, hogy előfordulhat az is, hogy az első betű egy egyjegyű és ekkor fel kell ismerni, hogy kell-e kettőzni vagy sem(pl. \textit{meg-gyúj-tot-ta}).
 \subsubsection{Szótagolási hibák a magyar Hunspellben}
+A leggyakoribb elválasztási hibák abból a tényből fakadnak, hogy a hunspell tervezői a tördelési szempontokat vették figyelembe, és így a rövid (egybetűs) kezdő és záró szótagokat letiltották. Ám ez, például összetett szavak esetében, azt eredményezte, hogy sokszor a szó közepén is több magánhangzóból álló szótagok jelentek meg.
 
-
-\begin{minipage}{0.5\textwidth}
-	Hunspell szótagolása:
+\begin{minipage}{0.4\textwidth}
+	\textbf{Hunspell szótagolása:}
 \begin{checkhyphens}
 	autóval
 	
@@ -145,16 +166,15 @@ A fenti algoritmus hatékonyságát nyilvánvalóan a minták mennyisége és ha
 	
 	messze
 \end{checkhyphens} 		
-\end{minipage}\noindent
-\begin{minipage}{0.5\textwidth}
-	Helyesen:
+\end{minipage}\hfill
+\begin{minipage}{0.4\textwidth}
+	\textbf{Helyesen:}
 
 	a-u-tó-val\\
 	szem-ü-veg-gel\\
 	has-i-zom\\
 	mesz-sze
 \end{minipage}
-
 
 \section{Deep learning alapú módszerek}
 \subsection{Deep learning bevezetés}
@@ -170,7 +190,7 @@ Mély tanulás esetén az eredmény minőségét alapvetően meghatározza a tan
 A hálótervezés során a Magyar Webkorpusz leggyakoribb $100000$ szaván kísérleteztünk \cite{halacsy2004creating,kornai2006web}.
 
 \section{A feldolgozás folyamata}
-A szótagoló jelenleg magyar nyelvre van tervezve, azonban az eljárás lényege univerzális.
+A szótagoló jelenleg magyar nyelvre van tervezve, azonban az eljárás lényege univerzális. A nyelvosztályozás jelenleg csak angol szavak szűrését jelenti. Az eredményekben, ahol nem térek ki rá, nem használtam.
 \begin{figure}[htp]
 	\includegraphics[trim={0 7cm 0 7cm},clip,
 	width=\textwidth]{figures/preprocessing.pdf}
@@ -183,7 +203,7 @@ Az adatfeldolgozás során az alábbi tisztítási eljárásokat végeztem:
 	\item[kisbetűsítés] A karaktereket kisbetűssé tettem.
 	\item[speciális karakter szűrés] Az alábbi speciális karaktereket töröltem a szövegből(a \textit{python} {\fontfamily{pcr}\selectfont
 		string.punctuation%
-	} környezetfüggően választja meg ezeket, így máshol eltérhetnek): ! " \# \$ \% \& ' ( ) * + , - . / : ; < = > ? @ [ \\ ] \^{} \_ ` \{ | \} \~{}
+	} környezetfüggően választja meg ezeket, így máshol eltérhetnek): ! " \# \$ \% \& ' ( ) * + , - . / : ; < = > ? @ [ \textbackslash\, ] \^{} \_ ` \{ | \} \~{}
 	\item[szám szűrés] A szövegben található számokat töröltem.
 \end{description}
 
@@ -198,12 +218,19 @@ A háló sajnos nem minden előforduló esetet tud kezelni, így a későbbi imp
 A tanítások kiértékelése során arra a következtetésre jutottam, hogy a hunspell és az én elválasztóm közötti eltérések jelentős része akkor adódik, ha idegen nyelvű szót próbálunk meg elválasztani. Így az elválasztó javításának érdekében egy nyelv osztályozót is bevezettem.
 
 A jelenlegi nyelvválasztó egy egyszerű bigram gyakoriság alapú osztályozó.
-%TODO
+Az osztályozó azon alapszik, hogy a nyelvekre jellemző, hogy mely karakterkettősök (bigramok) fordulnak elő leggyakrabban bennük. Az osztályozó szótárát három-három Wikipédia cikk képzi, azaz pár ezer szó. Ezek alapján kiválasztjuk a leggyakoribb bigrammokat és ezzel vetjük össze a vizsgálandó szót.
+
+A szóban megszámoljuk az összes bigramot és összevetjük, hogy az egyes nyelvek listájából hány szerepel benne. Így kapunk egy-egy $0$-$1$ közötti számot, amit értelmezhetünk úgy, mint annak a valószínűsége, hogy a szó az adott nyelvből származik. Amennyiben egy nyelv a többihez képest kimagaslóan jól teljesített, akkor azt mondhatjuk, hogy a szó nagy valószínűséggel abból a nyelvből származik.
+
+Mivel az angol szavakat szerettem volna kiszűrni, úgy állítottam be a küszöbértéket, hogy minimalizáljam a kiesett magyar szavakat, azaz csak akkor dobjon el egy szót, ha nagyon biztos abban, hogy az angol.
+
+Ha $0,60$-as különbséget várunk el az osztályozótól, a vizsgált kb. $100 000$ egyedi szóból $571$-et jelöl meg angolnak, amiből $46$-nak van értelmes magyar jelentése (többek között a \textit{perc, citrom, hierarchia} alakjai).
 \section{Előrecsatolt neurális háló}
 A neurális háló lényege ebben ez esetben az, hogy a szó minden karakterére eldöntsük a környezetében lévő karakterek segítségével, hogy a karakternél van-e elválasztás.
 
 A szavakat minden karakter mentén felbontjuk az adott ablakméretre, majd ezekre az ablakokra tanítva oldunk meg egy osztályozó problémát, ami ad egy címkét a karakternek és a címke alapján végezzük az elválasztást.
 \subsection{Karakter címkézés}
+\label{sec:cimke}
 Kétféle címkézést használunk. Az első eset előnye, hogy több címke van így több információt adunk át a modellnek, a másodiké pedig, hogy a jósolt címkézés minden esetben elválasztássá alakítható. Ez a BMES esetében nem teljesül: ha két karakterre egymás után E-t jósol, az nem alakítható rögtön valós elválasztássá.
 
 A jelenlegi munkában a BM címkézést elemeztük.
@@ -236,18 +263,24 @@ szó címkézése:
 	BMBBMMM%
 }
 \subsection{Adat-előkészítés}
+\Figref{fig:char}án láthatjuk a tanítóadat előállításának módját. Az alábbiakban egy példa alapján végigmegyünk a lépéseken.
+
 \begin{figure}[htp]
 	\includegraphics[trim={0 6cm 0 4cm},clip,
 	width=\textwidth]{figures/characters.pdf}
 	\caption{Tanítóadat előállítása}\par\medskip\centering
 	\label{fig:char}
 \end{figure}
-Ha az \textit{nyúlanyó} szó \textit{a} karakterét szeretnénk egy $5$-ös szimmetrikus ablakú környezetben tanítóadatnak előkészíteni, \textbf{BM} címkézéssel, akkor az alábbi előkészületeket kell tennünk:
-\subsubsection{Tanítás a karakter környezetéből}
 
-A jelölésrendszerünk alapján az $5$-ös szimmetrikus ablak azt jelenti, hogy a karakter előtt és a karakter után is két-két további karaktert veszünk, és ez alapján az öt karakter alapján próbáljuk meg eldönteni, milyen címke illeszkedik a középső karakterre. Ezt jelöljük \textit{2-1-2}-vel. Az \textit{nyúlanyó} szó és az \textit{a} betű esetén ez \textit{úl\,a\,ny} ablakot jelent.
+Ha az \textit{leopárd} szó \textit{o} karakterét szeretnénk egy $5$-ös szimmetrikus ablakú környezetben tanítóadatnak előkészíteni, \textbf{BM} címkézéssel, akkor az alábbi előkészületeket kell tennünk:
+\subsubsection{Tanítás a karakter környezetéből(ablakozás)}
+
+A jelölésrendszer alapján az $5$-ös szimmetrikus ablak azt jelenti, hogy a karakter előtt és a karakter után is két-két további karaktert veszünk, és ez alapján az öt karakter alapján próbáljuk meg eldönteni, milyen címke illeszkedik a középső karakterre. Ezt jelöljük \textit{2-1-2}-vel. Az \textit{leopárd} szó és az \textit{o} betű esetén ez \textit{le\,o\,pá} ablakot jelent.
 
 Ha az ablak túlnyúl a szó szélén, az elterjedt jelölés alapján a szó elején \^\ karaktereket, illetve a szó végén további \$ karaktereket illesztünk az ablakba.
+\subsubsection{Cimkézés}
+\Secref{sec:cimke}ben ismertetett címkézési eljárással az ablakhoz hozzárendelünk egy címkét. A \textit{le\,o\,pá} esetén az \textit{o} betű egy szótag kezdete, így a \textbf{BM} címkézés esetén \textit{B} címkét kap.
+
 \subsubsection{One-hot kódolás}
 
 Ahhoz, hogy a karakterekből a keras által feldolgozható tanítóadat legyen, one-hot kódolást végzünk rajta. 
@@ -259,19 +292,40 @@ A \textbf{BM} illetve \textbf{BMES} címkézést ugyanígy reprezentáljuk egy $
 \subsubsection{Lapítás}
 
 Ha a fentieket elvégezzük egy $5$ hosszú ablakra, akkor a magyar ábécét figyelembe véve $5$ darab $35+2$ hosszú tömböt kapunk. A háló bemenetét úgy kapjuk meg, hogy ezt ellapítjuk egy $5\cdot37$ hosszú tömbbé (amiben $5$ helyen $1$-es, minden további helyen $0$-ás szerepel). Ez lesz a tanítóadatunk.
+
+Vagyis a háló bemenete a \textit{le\,o\,pá} ablakot reprezentáló $185$ hosszú $\{0,1\}$ tömb, az elvárt kimenet pedig a \textit{B}-t reprezentáló $1$-es.
+\subsection{Neurális háló}
+Egy egyszerű előre csatolt neurális hálót használtam, ahol a rejtett rétegek számát és a rétegek méretét optimalizálás után kaptam (lásd: \tabref{tab:optim}).
+
+A már megismert $5$-ös ablakra \figref{fig:model}án látható modell vizualizációt szolgáltatja a Keras.\footnote{A None réteg azt jelenti, hogy a háló képes több dimenziót fogadni. Lásd bővebben: https://github.com/fchollet/keras/issues/2054} A tanítás során \textit{sigmoid} aktivációs függvényt és \textit{adam} optimalizációt használtam.
+\begin{figure}[htp]\centering
+	\includegraphics[
+	height=0.4\textheight]{figures/model.png}
+	\caption{A háló modellje}\par\medskip\centering
+	\label{fig:model}
+\end{figure}
+
 \subsection{Tanító-, validációs- és tesztadatok}
+\label{sec:adatszetvalasztas}
+Az tanítóadatok előállítási módját immár ismertettük. Azonban a deep learning technikákhoz még át kell tekintenünk a következőt: a neurális hálót  egy ún. tanító adathalmazon szokás tanítani. A tanítás eredményességét egy ún. validációs adathalmaz alapján ellenőrizzük minden tanítási lépés során. A tanítás megállításának lépését is ez alapján határozzuk meg. Végül, az elkészült, betanult háló eredményességét az ún. teszt adatokon teszteljük.
+
+Mit is jelent ez számunkra? Az első, laikus (és így a legtöbb teszten futtatott) megoldást \figref{fig:dfdef}án láthatjuk. Ebben a korpuszból származó egyedi szavakat először alávetettük a már ismertetett tanítóadat generáló eljárásnak, majd a kapott be- és kimeneti tömböket megkeverjük és felosztjuk a három adattömbre. Példáinkban 70-20-10 arányban.
 \begin{figure}[htp]
 	\includegraphics[trim={0 9cm 0 7cm},clip,
 	width=\textwidth]{figures/dataflowdefault.pdf}
 	\caption{A kezdeti adatgenerálás}\par\medskip\centering
 	\label{fig:dfdef}
 \end{figure}
+
+Azonban az adathalmazok függetlenségét ez a megoldás sérti. Mégpedig kétféleképp: az egyik eset, hogy az adatok karakterenként vannak szétválasztva, így előfordulhat, hogy nincs olyan szó, ami egy az egyben szerepelne valamelyik halmazban. Erre szolgál megoldásként \figref{fig:dfuwords}án látható eljárás. Ekkor a halmazok szétválasztása a szavak szintjén történik, majd csak ez után generálódik le a tényleges be-, illetve kimenet.
 \begin{figure}[htp]
 	\includegraphics[trim={0 8cm 0 7cm},clip,
 	width=\textwidth]{figures/dataflowuwords.pdf}
 	\caption{Egyedi szavak felosztása}\par\medskip\centering
 	\label{fig:dfuwords}
 \end{figure}
+
+A másik probléma a tanítóadatok egyediségében rejlik. Ha egy ablak két szóban is szerepelt, akkor az adathalmazban kétszer fog szerepelni. Ezért \figref{fig:dfuchars}a alapján először előállítódik a be-, kimenet, majd ezeket egyedivé tesszük. Ezután megkeverhetjük, és szétválaszthatjuk a három adathalmazzá. Ennek az eljárásnak az előnye, hogy ekkor a teszt adatok ténylegesen függetlenek a tanító és validációs adatoktól, a hátránya viszont, hogy nem reprezentálja az ablakok előfordulását. Ha az \textit{abcdf} ablak általában \textit{c}-nél elválaszt, de van olyan szó, amiben nem, akkor mindkettőnek azonos lesz a súlya (és ha az egyik a tanító, a másik a teszt adathalmazba fog kerülni, ez utóbbi a jó tanulás esetén hibát fog jelezni).
 \begin{figure}[htp]
 	\includegraphics[trim={0 8cm 0 7cm},clip,
 	width=\textwidth]{figures/dataflowuchars.pdf}
@@ -281,18 +335,79 @@ Ha a fentieket elvégezzük egy $5$ hosszú ablakra, akkor a magyar ábécét fi
 \section{Eredmények}
 Az első tanítások eredményei \tabref{tab:firstlearn}ban láthatóak.
 
-\tabref{tab:optim} a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
+\Tabref{tab:optim} a hiperparaméterek optimalizálási eredményeit foglalja össze. Itt a 2-1-2 környezetű karakter-címkézés 2-10 rétegű, rétegenként 10-100 neuronú tanítások közül láthatjuk azokat, amelyeknek validációs hibája megközelíti a 4 százalékot.
 
-\Tabref{tab:winoptim} a karakter címkézéséhez körülötte megvizsgált karakterek számát változtattuk. Jól látható, hogy egy-egy karakter bevétele még jóval kevesebb információt árul el a címkézésről, mint a többi. Hasonlóképp észrevehető, hogy a túl nagy ablak is ront a helyzeten. Ez azért jelenik meg, mivel a nagyobb ablakok bevezetésével egyre ritkábbak lesznek az adott típusú minták előfordulása az adatokban.
+\Tabref{tab:winoptim} a karakter címkézéséhez a körülötte megvizsgált karakterek számát (ablak méretét) változtattuk. Jól látható, hogy egy-egy karakter bevétele még jóval kevesebb információt árul el a címkézésről, mint a többi. Hasonlóképp észrevehető, hogy a túl nagy ablak is ront a helyzeten. Ez azért jelenik meg, mivel a nagyobb ablakok bevezetésével egyre ritkábbak lesznek az adott típusú minták előfordulása az adatokban.
+
+\Tabref{tab:optprf}ban a 3-1-3 ablak hiperparamétereit láthatjuk, itt már a Precision, Recall és Fscore értékekkel számolva.
+
+\subsection{Adatszétválasztás}
+\Secref{sec:adatszetvalasztas}ben ismertetett háromféle adatszétválasztási módszer különbségei:
+\begin{table}[htp]
+	\includegraphics[
+	width=0.9\textwidth]{figures/data_uniqueness.png}
+	\caption{Adat egyediség}\par\medskip\centering
+	\label{tab:uniq}
+\end{table}
+A karakter egyediségről elmondható, hogy többet hibázik, főként az összetett szavak szótagolásánál.
+\subsection{Nyelvfelismerés}
+A jelenleg beiktatott nyelvfelismerő nem változtatott sokat az értékeken. Mivel csak részben szűrte ki az angol szavakat, ezzel csak csökkentette az angol szavakra való tanulás esélyét, így a bent maradt szavak súlyosabb hibát eredményeztek.
+\subsection{Hibás szavak listája}
+Az alábbi listában $400$ a tanításban nem szereplő szóra való szótagolás hibás szavai szerepelnek. Ebben a tanításban, és a $400$ szó kiválogatásakor használtuk a bigram nyelvfelismerőt. A $400$ szóból 16 esetében tért el a szótagolónk a Hunspellétől ($4\%$):
+
+\hfill
+\begin{minipage}{0.4\textwidth}
+	\textbf{A modell szótagolása:}
+	
+	fre-u-de\\
+	áram-k-i-ma-ra-dás \\
+	gyer-me-k-ott-hon \\
+	hú-gyúti\\
+	mui-to\\
+	attrak-ció\\
+	li-ech-tens-tein\\
+	hauser\\
+	has-i-zom\\
+	elöl-há-tul\\
+	cadre\\
+	sho-ulders\\
+	so-ci-a-le\\
+	há-ny-in-gert\\
+	va-luták\\
+	exp-res-sing
+\end{minipage}\hfill
+\begin{minipage}{0.4\textwidth}
+	\textbf{A Hunspell által adot cél:}
+	
+	freu-de\\
+	áram-ki-ma-ra-dás\\
+	gyer-mek-ott-hon\\
+	húgy-úti\\
+	mu-i-to\\
+	att-rak-ció\\
+	liech-tens-tein\\
+	ha-user\\
+	has-izom\\
+	el-öl-há-tul\\
+	cad-re\\
+	sho-ul-ders\\
+	so-ci-ale\\
+	hány-in-gert\\
+	va-lu-ták\\
+	exp-r-es-sing
+\end{minipage}\hfill
+\medskip
+
+Mint láthatjuk, továbbra is jelentős részben az idegen szavak okoznak eltérést, azonban szeretném kiemelni a \textit{has-i-zom} és a \textit{so-ci-a-le} szótagolásokat, ahol az egy szótagban több magánhangzót tartalmazó eredeti szótagolás helyett szótagonként egyet tartalmazót adott a modellünk.
 \subsection{A táblázatokban használt rövidítések}
 \begin{itemize}
 	\item Length: \textit{a-1-b} a vizsgált karakter előtt $a$ utána $b$ karaktert veszünk be környezetébe, ami alapján a címkézést végezzük.
 	\item Tag: a címkézés BM vagy BMES
-	\item NLayer: a háló rejtett rétegeinek száma
-	\item NHidden: a rejtett rétegek mérete
+	\item NLayer, NL: a háló rejtett rétegeinek száma
+	\item NHidden, NH: a rejtett rétegek mérete
 	\item Val\_loss: a validációs adatok binary(BM) illetve categorical(BMES) crossentropy hibafüggvénnyel számolt hibája
 	\item Test\_w: maximumkiválasztás után hibás eredményt adó teszt adatok száma
-	\item Epochs: a tanításhoz szükséges epoch-ok száma. A tanítás végét early stoping módszerrel határoztuk meg.
+	\item Epochs, Ep.s: a tanításhoz szükséges epoch-ok száma. A tanítás végét early stoping módszerrel határoztuk meg.
 \end{itemize}
 \begin{table}[htp]\centering
 	\begin{tabular}{|r|c|c|c|r|r|r|}
@@ -394,7 +509,7 @@ Az első tanítások eredményei \tabref{tab:firstlearn}ban láthatóak.
 	\end{tabular}
 
 	
-	\caption{Hiperparaméter optimalizálás}
+	\caption{Hiperparaméter optimalizálás (2-1-2)}
 	\label{tab:optim}
 \end{table}
 \end{small}
@@ -468,6 +583,45 @@ Az első tanítások eredményei \tabref{tab:firstlearn}ban láthatóak.
 \caption{Karakter-környezet ablak méretének optimalizálása}
 \label{tab:winoptim}
 \end{table}
+\end{small}
+\begin{small}
+	\begin{table}[tp]\centering
+		\begin{tabular}{|l|c|r|r|r|r|r|r|r|}
+			\hline
+			No&Length&NL&NH&Ep.s&Val\_loss&Precision&Recall&Fscore\\
+			\hline\hline
+			5.6&3-1-3&5&60&143&0.03939&99.247&99.022&99.134\\
+			\hline
+			5.8&3-1-3&5&80&149&0.03716&99.275&99.107&99.191\\
+			\hline
+			5.9&3-1-3&5&90&147&0.03765&99.213&99.070&99.142\\
+			\hline
+			5.10&3-1-3&5&100&148&0.03783&99.311&99.164&99.238\\
+			\hline
+			5.11&3-1-3&5&110&146&0.03756&99.279&99.107&99.193\\
+			\hline
+			5.12&3-1-3&5&120&128&0.03571&99.369&98.977&99.173\\
+			\hline
+			5.13&3-1-3&5&130&124&0.03793&99.406&98.965&99.185\\
+			\hline
+			6.6&3-1-3&6&60&165&0.03982&99.193&99.121&99.157\\
+			\hline
+			6.7&3-1-3&6&70&162&0.03967&99.294&98.931&99.112\\
+			\hline
+			6.12&3-1-3&6&120&145&0.03844&99.293&99.116&99.204\\
+			\hline
+			6.13&3-1-3&6&130&145&0.03729&99.274&99.057&99.165\\
+			\hline
+			7.9&3-1-3&7&90&187&0.03963&99.285&99.004&99.144\\
+			\hline
+			7.10&3-1-3&7&100&151&0.03708&99.259&99.200&99.230\\
+			\hline
+			7.12&3-1-3&7&120&139&0.03776&99.271&99.173&99.222\\
+			\hline
+		\end{tabular}
+		\caption{Hiperparaméter-optimalizálás (3-1-3)}
+		\label{tab:optprf}
+	\end{table}
 \end{small}
 \newpage
 \bibliographystyle{plain}
