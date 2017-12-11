@@ -1,7 +1,0 @@
-# Texstudio left a lot of thrash:
-*.aux
-*.bbl
-*.blg
-*.log
-*.gz
-*.toc
